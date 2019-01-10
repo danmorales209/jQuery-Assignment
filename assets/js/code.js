@@ -76,9 +76,8 @@ function initateAttack(attacker, defender) {
 
 function characterAction() {
     var temp = "";
-    if($(this).getState() === "choose") {
-        alert($(this).getState());
-    }
+    alert($(this).attr("index"));
+    
 
 };
 /*function selectAttacker (this) {
