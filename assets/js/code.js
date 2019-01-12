@@ -64,6 +64,7 @@ class character {
         this.state = "choose";
         this.role = "";
     };
+    
 
 };
 
@@ -74,15 +75,10 @@ function initateAttack(attacker, defender) {
     defender.checkCharacter();
 };
 
-function characterAction() {
-    var temp = "";
-    alert($(this).attr("index"));
-    
+function checkState() {
+    console.log($(this).attr("index"));
+}
 
-};
-/*function selectAttacker (this) {
-
-}*/
 
 
 
@@ -103,8 +99,21 @@ $(document).ready(function() {
         $(element).children(".character-name").text(charArray[index].getName());
         $(element).children(".character-photo").attr("src", "https://via.placeholder.com/150");
         $(element).children(".character-hp").text(charArray[index].getHP());
-    })
+    });
 
-    charContainerArray.on("click", characterAction);
+    $(".character-container").on("click", function() {
+        let charIndex = $(this).attr("index");
+        let charState = charArray[charIndex].getState();
+
+
+        if (charState === "choose") {
+            charParent = $(this).parent();
+            $(this).appendTo($("#character-select-container"));
+            charArray[charIndex].changeState("player");
+            console.log(`New State: ${charArray[charIndex].getState()}`);
+        }
+
+        
+    });
 
 });
