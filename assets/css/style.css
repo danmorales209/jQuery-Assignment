@@ -1,1 +1,24 @@
 /* Custom CSS */
+#character-tray {
+    width: 80%;
+    height: auto;
+}
+
+.character-container {
+    width: auto;
+    height: auto;
+    display: inline-block;
+    padding: 5px;
+    margin: 5px;
+}
+
+.character-container h3, .character-container img {
+    margin: 0 auto;
+    text-align: center;
+    display: block;
+
+}
+
+#reset-button {
+    display: none;
+}
