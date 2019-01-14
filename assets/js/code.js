@@ -8,7 +8,7 @@ class character {
         this.attackPower = inputAttack;
         this.counterPower = inputCounter;
         this.multiplier = 1;
-        this.role = "";
+        this.isAlive = true;
         this.state = "choose";
         this.imgPath = `assets\\images\\${img}.png`;
 
@@ -18,7 +18,9 @@ class character {
 
     // pass a character object
     attack(defender) {
-        defender.currentHP -= (this.attack * this.multiplier);
+        let damage = this.attackPower * this.multiplier;
+
+        defender.currentHP -= (damage);
         return `${this.name} attacked ${defender.getName()} for ${this.attackPower * this.multiplier++} damage!`;
     };
 
@@ -42,37 +44,47 @@ class character {
 
     getRole() {
         return this.role;
-    }
+    };
 
-    changeRole(newRole) {
-        this.role = newRole;
-    }
+    getAlive() {
+        return this.isAlive;
+    };
 
     changeState(newState) {
         this.state = newState;
     };
 
+    flipAlive() {
+        this.isAlive = !(this.isAlive);
+    };
+
     checkCharacter() {
         if (this.currentHP <= 0) {
-            this.state = "defeated";
+            this.changeState("defeated");
+            this.flipAlive();
         }
-    }
+    };
 
     reset() {
         this.currentHP = this.initalHP;
         this.multiplier = 1;
         this.state = "choose";
-        this.role = "";
+        this.isAlive = true;
     };
 
 
 };
 
 function initateAttack(attacker, defender) {
+
     $("#attack-message").text(attacker.attack(defender));
-    attacker.checkCharacter();
-    $("#defend-message").text(defender.defend(attacker));
     defender.checkCharacter();
+    updateCharacterDisplay(defender);
+    if (!defender.getAlive()) { return; }
+
+    $("#defend-message").text(defender.defend(attacker));
+    attacker.checkCharacter();
+    updateCharacterDisplay(attacker);
 };
 
 function colorUpdate(element, state) {
@@ -80,7 +92,7 @@ function colorUpdate(element, state) {
     if (state === "choose") {
         $(element).css("background-color", "white");
     }
-    else if (state == "player") {
+    else if (state === "player") {
         $(element).css("background-color", "green");
     }
     else if (state === "enemy") {
@@ -89,14 +101,41 @@ function colorUpdate(element, state) {
     else if (state.includes("idle")) {
         $(element).css("background-color", "gray");
     }
+    else if (state === "defeated") {
+        $(element).css({"background-color":"black","color":"white"});
+    }
+}
+
+function updateCharacterDisplay(character) {
+    if (character.getState() === "player") {
+        $("#character-select-container .character-container .character-hp").text(character.getHP());
+    }
+    else if (character.getState() === "defender") {
+        $("#defender-container .character-container .character-hp").text(character.getHP());
+    }
+}
+
+function updateGame(character) {
+    if (!character.getAlive) {
+        if (character.getState() === "player") {
+
+        }
+    }
 }
 
 $(document).ready(function () {
+    // delete after debug
+    function debugHP() {
+        for (let i = 0; i < charArray.length; i++) {
+            console.log(charArray[i].getHP());
+        }
+    }
+
     var charArray = [
         new character("Obi-Wan Kenobi", 120, 10, 10, '#'),
         new character("Luke Skywalker", 100, 10, 10, '#'),
         new character("Darth Sideous", 150, 10, 10, '#'),
-        new character("Darth Maul", 180, 10, 10, "#")
+        new character("Darth Maul", 180, 10, 100, "#")
     ];
 
     var charContainerArray = $(".character-container");
@@ -111,21 +150,20 @@ $(document).ready(function () {
         console.clear();
         let charIndex = $(this).attr("index");
         let charState = charArray[charIndex].getState();
+        console.log(charState);
 
         if (charState === "choose") {
             $(this).appendTo($("#character-select-container"));
             charArray[charIndex].changeState("player");
 
             colorUpdate($(this), charArray[charIndex].getState());
-            //debug
-            console.log(`${charArray[charIndex].getName()} New State: ${charArray[charIndex].getState()}`);
 
             $("#character-tray .character-container").each(function ({ }, element) {
-                index = $(element).attr("index");
+                let index = $(element).attr("index");
 
                 $(element).appendTo($("#enemy-select-container"));
                 charArray[index].changeState("enemy");
-                colorUpdate(element, charArray[index].getState());
+                colorUpdate(element, "enemy");
 
                 console.log(`${charArray[$(element).attr("index")].getName()} new state is ${charArray[index].getState()}`);
             });
@@ -136,7 +174,7 @@ $(document).ready(function () {
             charArray[charIndex].changeState("defender");
 
             $("#enemy-select-container .character-container").each(function ({ }, element) {
-                index = $(element).attr("index");
+                let index = $(element).attr("index");
                 charArray[index].changeState("enemy idle");
                 colorUpdate(element, charArray[index].getState());
 
@@ -146,15 +184,32 @@ $(document).ready(function () {
     });
 
     $("#attack-button").on("click", function () {
-        let checkDefender = ($("#defender-container").childern().length !== 0);
+        let checkDefender = ($("#defender-container").children().length !== 0);
 
-        if(checkDefender) {
+        if (checkDefender) {
             let indexDef = $("#defender-container .character-container").attr("index"); // defender index
-            let indexAtt = $("character-select-container .character-container").attr("index"); // attacker index
+            let indexAtt = $("#character-select-container .character-container").attr("index"); // attacker index
 
             let currentAttacker = charArray[indexAtt];
             let currentDefender = charArray[indexDef];
+
             initateAttack(currentAttacker, currentDefender);
+
+            console.log(currentAttacker.getAlive())
+
+            if (!currentDefender.getAlive()) {
+                $("#defender-container").empty();
+                
+                $("#enemy-select-container .character-container").each(function ({ }, element) {
+                    let index = $(element).attr("index");
+                    charArray[index].changeState("enemy");
+                    colorUpdate(element, charArray[index].getState());
+                });
+            }
+            else if (!currentAttacker.getAlive()) {
+                
+                colorUpdate($("#character-select-container .character-container"), "defeated");
+            }
         }
 
     })
