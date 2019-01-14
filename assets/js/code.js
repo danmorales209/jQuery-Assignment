@@ -70,6 +70,7 @@ class character {
         this.multiplier = 1;
         this.state = "choose";
         this.isAlive = true;
+        this.currentHP = this.initalHP;
     };
 
 
@@ -102,7 +103,7 @@ function colorUpdate(element, state) {
         $(element).css("background-color", "gray");
     }
     else if (state === "defeated") {
-        $(element).css({"background-color":"black","color":"white"});
+        $(element).css({ "background-color": "black", "color": "white" });
     }
 }
 
@@ -185,8 +186,9 @@ $(document).ready(function () {
 
     $("#attack-button").on("click", function () {
         let checkDefender = ($("#defender-container").children().length !== 0);
+        let playerIndex = $("#character-select-container .character-container").attr("index");
 
-        if (checkDefender) {
+        if (checkDefender && charArray[playerIndex].getAlive()) {
             let indexDef = $("#defender-container .character-container").attr("index"); // defender index
             let indexAtt = $("#character-select-container .character-container").attr("index"); // attacker index
 
@@ -198,19 +200,40 @@ $(document).ready(function () {
             console.log(currentAttacker.getAlive())
 
             if (!currentDefender.getAlive()) {
-                $("#defender-container").empty();
-                
+                $("#defender-container .character-container").prependTo($("#defeated-container")).css("display", "none");
+
                 $("#enemy-select-container .character-container").each(function ({ }, element) {
                     let index = $(element).attr("index");
                     charArray[index].changeState("enemy");
                     colorUpdate(element, charArray[index].getState());
                 });
+
+                $("#game-result-message").text(`${currentDefender.getName()} has been defeated. Click on another enemy to continue.`)
             }
             else if (!currentAttacker.getAlive()) {
-                
+
                 colorUpdate($("#character-select-container .character-container"), "defeated");
+                $("#character-select-container .character-container .character-hp").text(0);
+                $("#reset-button").css("display", "inline-block");
+                $("#game-result-message").text(`${currentAttacker.getName()} has been defeated. Press reset to start again.`);
             }
         }
 
-    })
+    });
+
+    $("#reset-button").on("click", function () {
+
+        for (let i = 0; i < charArray.length; i++) {
+            charArray[i].reset();
+
+        }
+
+        $(".character-container").appendTo("#character-tray").css({ "color": "black", "display": "inline-block" });
+        $(".character-container").each(function (index, element) {
+            colorUpdate($(element), "choose");
+            $(element).children(".character-hp").text(charArray[index].getHP());
+        });
+        $("#reset-button").css("display", "none");
+        $("#attack-message, #defend-message, #game-result-message").text("");
+    });
 });
