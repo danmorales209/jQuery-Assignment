@@ -50,6 +50,10 @@ class character {
         return this.isAlive;
     };
 
+    getImg() {
+        return this.imgPath;
+    }
+
     changeState(newState) {
         this.state = newState;
     };
@@ -125,25 +129,21 @@ function updateGame(character) {
 }
 
 $(document).ready(function () {
-    // delete after debug
-    function debugHP() {
-        for (let i = 0; i < charArray.length; i++) {
-            console.log(charArray[i].getHP());
-        }
-    }
-
+    
     var charArray = [
-        new character("Obi-Wan Kenobi", 120, 10, 10, '#'),
-        new character("Luke Skywalker", 100, 10, 10, '#'),
-        new character("Darth Sideous", 150, 10, 10, '#'),
-        new character("Darth Maul", 180, 10, 100, "#")
+        new character("Obi-Wan Kenobi", 120, 5, 10, 'obi-wan'),
+        new character("Luke Skywalker", 100, 10, 5, 'luke'),
+        new character("Darth Sideous", 150, 15, 15, 'sidious'),
+        new character("Darth Maul", 180, 20, 20, "maul")
     ];
 
     var charContainerArray = $(".character-container");
 
+    $("*").css("font-family","'Poller One', cursive");
+
     charContainerArray.each(function (index, element) {
         $(element).children(".character-name").text(charArray[index].getName());
-        $(element).children(".character-photo").attr("src", "https://via.placeholder.com/100");
+        $(element).children(".character-photo").attr("src", charArray[index].getImg());
         $(element).children(".character-hp").text(charArray[index].getHP());
     });
 
@@ -207,8 +207,14 @@ $(document).ready(function () {
                     charArray[index].changeState("enemy");
                     colorUpdate(element, charArray[index].getState());
                 });
+                if($("#enemy-select-container").children().length === 0) {
+                    $("#game-result-message").text("You win! Press resart to play again.");
+                    $("#reset-button").css("display","inline-block");
+                }
+                else {
+                    $("#game-result-message").text(`${currentDefender.getName()} has been defeated. Click on another enemy to continue.`);
+                }
 
-                $("#game-result-message").text(`${currentDefender.getName()} has been defeated. Click on another enemy to continue.`)
             }
             else if (!currentAttacker.getAlive()) {
 
@@ -225,10 +231,12 @@ $(document).ready(function () {
 
         for (let i = 0; i < charArray.length; i++) {
             charArray[i].reset();
-
         }
 
-        $(".character-container").appendTo("#character-tray").css({ "color": "black", "display": "inline-block" });
+        for (let i = 0; i < charArray.length; i++) {
+            $("#character-"+(i+1)).appendTo("#character-tray").css({ "color": "black", "display": "inline-block" });
+        }
+
         $(".character-container").each(function (index, element) {
             colorUpdate($(element), "choose");
             $(element).children(".character-hp").text(charArray[index].getHP());

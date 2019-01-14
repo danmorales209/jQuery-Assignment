@@ -1,7 +1,20 @@
 /* Custom CSS */
-#character-tray {
-    width: 80%;
+
+#character-tray, {
+    width: 60%;
     height: auto;
+    display: block;
+    margin: 5px auto;
+}
+
+#character-select-container, #enemy-select-container, #defender-container{
+    margin: 5px auto 5px 10px;
+}
+
+#game-result-message {
+    font-size: 1.1em;
+    border: 3px solid black;
+    background-color: white;
 }
 
 .character-container {
@@ -12,6 +25,7 @@
     margin: 5px;
     border: 3px solid black;
     border-radius: 15px;
+    background-color: white;
 }
 
 .character-container h3, .character-container img {
@@ -23,4 +37,39 @@
 
 #reset-button {
     display: none;
+}
+
+html {
+    height: 100%;
+    background-image: url("../images/background.jpg");
+    background-size: cover;
+    font-family: 'Poller One', cursive;
+}
+
+input {
+    font-family: 'Poller One', cursive;
+    margin-left: 10px;
+    background-color: #9dfffd;
+    border-color: black;
+    font-size: 1.6em;
+}
+
+img {
+    border-radius: 100%;
+}
+
+h1 {
+    font-size: 2em;
+    border: 5px solid black;
+    background-color: white;
+}
+
+h2 {
+    font-size: 1em;
+    border: 3px solid black;
+    background-color: white;
+}
+
+h3 {
+    font-size: .9em;
 }
